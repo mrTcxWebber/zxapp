@@ -13,7 +13,30 @@
 
 <body>
     <header id="header">
-        <div class="head"><i class="btn-toggle-panel"></i><span class="head-title">发现</span></div>
+        <div class="head">
+            <!-- <i class="btn-toggle-panel"></i> -->
+            <span class="head-title">发现</span>
+            <div class="user-pic" id="J-userMenu">
+                <% if(user){ %>
+                    <img src="/images/timg.jpg" alt="头像" width="30" height="30">
+                    <% }else{ %>
+                        <img src="/images/touxiang.jpg" alt="头像" width="30" height="30">
+                        <% } %>
+            </div>
+            <div class="menu-info" id="member-info">
+                <% if(user){ %>
+                    <ul>
+                        <li><a href="javascript:;">发布文章</a></li>
+                        <li><a href="/logout">退出登录</a></li>
+                    </ul>
+                    <% }else{ %>
+                        <ul>
+                            <li><a href="javascript:;" id="J-showLoginBox">登录</a></li>
+                            <li><a href="javascript:;" id="J-showRegBox">注册</a></li>
+                        </ul>
+                        <% } %>
+            </div>
+        </div>
     </header>
     <div class="container">
         <ul class="item-list" id="item-list-box">
@@ -34,43 +57,62 @@
             <button type="button" class="btn-loadmore">加载更多</button>
             <% } %>
     </div>
+    <div id="overlay"></div>
+
+    <% if(!user){ %>
+        <!-- login dialog -->
+        <div class="dialog_container" id="login_dialog">
+            <div class="dialog_wrap">
+                <div class="dialog_head">
+                    <em class="btn-close-dialog">X</em>
+                    <h1>登录</h1>
+                </div>
+                <div class="dialog_main">
+                    <form action="javascript:;" method="post" onsubmit="return indexMain.submitHandler(this);">
+                        <div class="group">
+                            <input class="form-input" placeholder="账号" name="username" type="text">
+                        </div>
+                        <div class="group">
+                            <input class="form-input" placeholder="密码" name="pwd" type="password">
+                        </div>
+                        <button type="submit">登录</button>
+                    </form>
+                </div>
+                <div class="dialog_foot">
+                    <p style="padding:10px 0;"></p>
+                </div>
+            </div>
+        </div>
+        <!-- register dialog -->
+        <div class="dialog_container" id="regist_dialog">
+            <div class="dialog_wrap">
+                <div class="dialog_head">
+                    <em class="btn-close-dialog">X</em>
+                    <h1>注册</h1>
+                </div>
+                <div class="dialog_main">
+                    <form action="javascript:;" method="post" onsubmit="return indexMain.registHandler(this);">
+                        <div class="group">
+                            <input class="form-input" placeholder="账号" name="username" type="text">
+                        </div>
+                        <div class="group">
+                            <input class="form-input" placeholder="密码" name="pwd" type="password">
+                        </div>
+                        <button type="submit">注册</button>
+                    </form>
+                </div>
+                <div class="dialog_foot">
+                    <p style="padding:10px 0;"></p>
+                </div>
+            </div>
+        </div>
+        <% } %>
 </body>
+<script src="/javascripts/main.js"></script>
 <script>
     $(function() {
-        var currenPage = '<%= page %>' || 1;
-        var $btnMore = $(".btn-loadmore");
-        console.log(currenPage + 1)
-        $btnMore.on('click', function() {
-            $.ajax({
-                type: 'post',
-                url: '/list?page=' + (Number(currenPage) + 1),
-                success: function(msg) {
-                    if (msg.code !== 200) return;
-                    var data = msg.data,
-                        html = '',
-                        pageNum = msg.pageNum;
-                    currenPage = msg.page;
-                    $.each(data, function(i, v) {
-                        html += '<li class="item">' +
-                            '<div class="item-inner">' +
-                            '<a href="' + v.articleLink + '" target="_blank" class="item-link">' +
-                            '<h3>' + v.articleTitle + '</h3>' +
-                            '<div class="meto-row"><span class="tags bule">' + v.articleTag + '</span><span>' + v.articleAuthor + '</span><span>' + v.articlePvn + '</span></div>' +
-                            '</a>' +
-                            '</div>' +
-                            '</li>';
-                    })
-                    $("#item-list-box").append(html);
-                    if (pageNum == currenPage) {
-                        $btnMore.hide();
-                    }
-                },
-                error: function(err) {
-                    console.log(err)
-                }
-            })
-        });
-    })
+
+    });
 </script>
 
 </html>

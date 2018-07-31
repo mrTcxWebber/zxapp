@@ -1,9 +1,12 @@
 var express = require('express');
 var router = express.Router();
 var infoModel = require('../models/infoModel');
+var userModel = require('../models/userModel');
+var crypto = require('crypto');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
+    var userInfo = req.session.user;
     infoModel.find({}, function(err, doc) {
         if (err) {
             throw new Error(err);
@@ -15,11 +18,11 @@ router.get('/', function(req, res, next) {
                 throw new Error(err);
                 return;
             }
-            res.render('index', { article: doc, pageNum: pageNum, page: 1 });
+            res.render('index', { user: userInfo, article: doc, pageNum: pageNum, page: 1 });
         })
     })
 });
-
+// 分页
 router.post('/list', function(req, res, next) {
     var page = req.query.page || 1;
     var skipNum = (page - 1) * 8;
@@ -39,4 +42,74 @@ router.post('/list', function(req, res, next) {
     })
 });
 
+// 登录
+router.post('/login', function(req, res, next) {
+    var username = req.body.username;
+    var pwd = req.body.pwd;
+    var hash = crypto.createHash('md5');
+    var ncrypPwd = hash.update(pwd).digest('hex');
+
+    userModel.find({ username: username }, function(err, doc) {
+        if (err) {
+            return errCallback(function() {
+                res.json({ response: { msg: '查询出错请重试!', code: 500 } });
+            });
+        }
+        if (!doc.length) {
+            return errCallback(function() {
+                res.json({ response: { msg: '账号不存在，请先注册!', code: 500 } });
+            });
+        }
+        if (doc[0].password != ncrypPwd) {
+            return errCallback(function() {
+                res.json({ response: { msg: '密码错误，请重试!', code: 500 } });
+            });
+        }
+
+        req.session.user = doc[0];
+        res.json({ response: { msg: '登录成功！', code: 200 } });
+    });
+});
+
+// 注册 regist
+router.post('/regist', function(req, res, next) {
+    var username = req.body.username;
+    var pwd = req.body.pwd;
+    var hash = crypto.createHash('md5');
+    var ncrypPwd = hash.update(pwd).digest('hex');
+    var datas = { username: username, password: ncrypPwd };
+
+    userModel.find({ username: username }, function(err, doc) {
+        if (err) {
+            return errCallback(function() {
+                res.json({ response: { msg: '查询出错请重试!', code: 500 } });
+            });
+        }
+        if (doc.length) {
+            return errCallback(function() {
+                res.json({ response: { msg: '该账号已注册!', code: 500 } });
+            });
+        }
+        userModel.create(datas, function(err, doc) {
+            if (err) {
+                return errCallback(function() {
+                    res.json({ response: { msg: '查询出错请重试!', code: 500 } });
+                });
+            };
+            req.session.user = doc;
+            res.json({ response: { msg: '注册成功!', code: 200 } });
+        });
+    })
+});
+
+// 退出登录
+router.get('/logout', function(req, res, next) {
+    req.session.user = null;
+    setTimeout(function() { res.redirect('/'); }, 1000);
+});
+
+function errCallback(cb) {
+    typeof cb === 'function' && cb();
+    return false;
+}
 module.exports = router;
