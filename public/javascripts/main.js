@@ -138,8 +138,40 @@ var indexMain = (function($) {
         })
     }
 
+    // 文章发布 submit
+    function issueHandler(form) {
+        var articleTitle = form.title.value.trim();
+        var articleContent = form.content.value.trim();
+        if (!articleTitle || !articleContent) {
+            $("#edit-form .tips").text('请输入正确内容！');
+            return false;
+        }
+        // var formParam = $(form).serialize();
+        $.ajax({
+            method: 'post',
+            url: '/edit',
+            data: {
+                articleTitle: articleTitle,
+                articleContent: articleContent
+            },
+            dataType: 'json',
+            success: function(data) {
+                if (data.response.code == 200) {
+                    $("#edit-form .tips").text('发布成功!');
+                    setTimeout(function() { location.href = '/' }, 1000);
+                } else {
+                    $("#edit-form .tips").text(data.response.msg);
+                }
+            },
+            error: function(err) {
+                console.log(err.responseText)
+            }
+        })
+    }
+
     return {
         submitHandler: submitHandler,
-        registHandler: registHandler
+        registHandler: registHandler,
+        issueHandler: issueHandler
     }
 })(jQuery);

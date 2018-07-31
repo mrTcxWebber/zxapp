@@ -2,6 +2,7 @@ var http = require('http');
 var cheerio = require('cheerio');
 var infoModel = require('../../models/infoModel');
 
+
 function fetchData(page) {
     http.get('http://www.daqianduan.com/page/' + page, function(res) {
         res.setEncoding('utf-8');
@@ -26,7 +27,8 @@ function fetchData(page) {
                     'articleTag': articleItem.eq(i).children('header').find('.cat').text(),
                     'articleTime': articleItem.eq(i).find('time').text(),
                     'articleAuthor': articleItem.eq(i).find('.author').text(),
-                    'articlePvn': articleItem.eq(i).find('.pv').text()
+                    'articlePvn': articleItem.eq(i).find('.pv').text(),
+                    'articleContent': ''
                 }
                 articleData.push(articleItemData);
             });
@@ -42,6 +44,8 @@ function fetchData(page) {
         console.log('爬虫出错' + e)
     });
 }
+
+module.exports = fetchData;
 
 for (var j = 1; j <= 3; j++) {
     fetchData(j);

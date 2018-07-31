@@ -722,3 +722,57 @@ th {
 .dialog_wrap .dialog_foot {
     width: 100%;
 }
+
+
+/* 发布 */
+
+#edit-form {
+    display: inline-block;
+    width: 90%;
+    margin: 0 auto;
+    padding: 15px;
+}
+
+.form-group {
+    padding: 8px 0;
+    font-size: 14px;
+}
+
+.form-group h5 {
+    height: 30px;
+    line-height: 30px;
+    font-size: 15px;
+}
+
+.form-group .title {
+    padding: 10px;
+    width: 100%;
+    border-bottom: 1px solid #ddd;
+    box-sizing: border-box;
+    font-size: 14px;
+    color: #787878;
+}
+
+.form-group textarea {
+    padding: 10px;
+    width: 100%;
+    border: 1px solid #ddd;
+    height: 100px;
+    font-size: 14px;
+    color: #787878;
+    box-sizing: border-box;
+    border-radius: 8px;
+    resize: none;
+    outline: none;
+}
+
+.btn-submit {
+    display: block;
+    width: 100%;
+    margin: 20px auto 0;
+    padding: 10px 0;
+    font-size: 15px;
+    color: #ffffff;
+    background-color: #4ac4bc;
+    border-radius: 8px;
+}

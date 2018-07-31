@@ -1,0 +1,26 @@
+<header id="header">
+    <div class="head">
+        <!-- <i class="btn-toggle-panel"></i> -->
+        <span class="head-title"><%= title %></span>
+        <div class="user-pic" id="J-userMenu">
+            <% if(user){ %>
+                <img src="/images/timg.jpg" alt="头像" width="30" height="30">
+                <% }else{ %>
+                    <img src="/images/touxiang.jpg" alt="头像" width="30" height="30">
+                    <% } %>
+        </div>
+        <div class="menu-info" id="member-info">
+            <% if(user){ %>
+                <ul>
+                    <li><a href="/edit">发布文章</a></li>
+                    <li><a href="/logout">退出登录</a></li>
+                </ul>
+                <% }else{ %>
+                    <ul>
+                        <li><a href="javascript:;" id="J-showLoginBox">登录</a></li>
+                        <li><a href="javascript:;" id="J-showRegBox">注册</a></li>
+                    </ul>
+                    <% } %>
+        </div>
+    </div>
+</header>
