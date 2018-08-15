@@ -10,6 +10,7 @@ var indexMain = (function($) {
         oLoginDialog: $('#login_dialog'),
         oRegDialog: $('#regist_dialog'),
         oBtnClose: $('.btn-close-dialog'),
+        oArticleTagsBox: $('#atc-tags'),
         currenPage: 1
     };
 
@@ -71,6 +72,15 @@ var indexMain = (function($) {
         Dom.oBtnClose.on('click', function() {
             $(this).parents('.dialog_container').hide();
         });
+
+        // issue page select tags
+        Dom.oArticleTagsBox.on('a', 'click', function() {
+            var tag = $(this).data('tags');
+            $(this).addClass('on').siblings().removeClass('on');
+            $('#atc-tag-name').val(tag);
+            console.log(80)
+            console.log($('#atc-tag-name').val())
+        })
     }
 
     function Main() {
@@ -142,6 +152,7 @@ var indexMain = (function($) {
     function issueHandler(form) {
         var articleTitle = form.title.value.trim();
         var articleContent = form.content.value.trim();
+        var articleTag = form.tag.value.trim();
         if (!articleTitle || !articleContent) {
             $("#edit-form .tips").text('请输入正确内容！');
             return false;
@@ -152,7 +163,8 @@ var indexMain = (function($) {
             url: '/edit',
             data: {
                 articleTitle: articleTitle,
-                articleContent: articleContent
+                articleContent: articleContent,
+                articleTag: articleTag
             },
             dataType: 'json',
             success: function(data) {

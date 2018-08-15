@@ -738,6 +738,20 @@ th {
     font-size: 14px;
 }
 
+.tags-box {padding:10px 15px;overflow:hidden;}
+.tags-box a {
+    display: inline-block;
+    padding: 5px 10px;
+    border: 1px solid #A9A9A9;
+    margin-bottom: 10px;
+    text-align: center;
+    border-radius: 5px;
+}
+.tags-box a.on {border:1px solid #56c4e1;color:#56c4e1;}
+.tags-box a:active {
+    background: #eee;
+}
+
 .form-group h5 {
     height: 30px;
     line-height: 30px;

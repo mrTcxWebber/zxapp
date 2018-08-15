@@ -4,7 +4,6 @@ var infoModel = require('../models/infoModel');
 var userModel = require('../models/userModel');
 var crypto = require('crypto');
 var schedule = require('node-schedule');
-var fetchArticle = require('../public/javascripts/pq');
 
 
 
@@ -65,27 +64,6 @@ router.post('/login', function(req, res, next) {
         req.session.user = doc[0];
         res.json({ response: { msg: '登录成功！', code: 200 } });
     });
-
-    // userModel.find({ username: username }, function(err, doc) {
-    //     if (err) {
-    //         return errCallback(function() {
-    //             res.json({ response: { msg: '查询出错请重试!', code: 500 } });
-    //         });
-    //     }
-    //     if (!doc.length) {
-    //         return errCallback(function() {
-    //             res.json({ response: { msg: '账号不存在，请先注册!', code: 500 } });
-    //         });
-    //     }
-    //     if (doc[0].password != ncrypPwd) {
-    //         return errCallback(function() {
-    //             res.json({ response: { msg: '密码错误，请重试!', code: 500 } });
-    //         });
-    //     }
-
-    //     req.session.user = doc[0];
-    //     res.json({ response: { msg: '登录成功！', code: 200 } });
-    // });
 });
 
 // 注册 regist
@@ -109,27 +87,6 @@ router.post('/regist', function(req, res, next) {
         res.json({ response: { msg: '注册成功!', code: 200 } });
     });
 
-    // userModel.find({ username: username }, function(err, doc) {
-    //     if (err) {
-    //         return errCallback(function() {
-    //             res.json({ response: { msg: '查询出错请重试!', code: 500 } });
-    //         });
-    //     }
-    //     if (doc.length) {
-    //         return errCallback(function() {
-    //             res.json({ response: { msg: '该账号已注册!', code: 500 } });
-    //         });
-    //     }
-    //     userModel.create(datas, function(err, doc) {
-    //         if (err) {
-    //             return errCallback(function() {
-    //                 res.json({ response: { msg: '查询出错请重试!', code: 500 } });
-    //             });
-    //         };
-    //         req.session.user = doc;
-    //         res.json({ response: { msg: '注册成功!', code: 200 } });
-    //     });
-    // })
 });
 
 // 退出登录
@@ -149,15 +106,21 @@ router.get('/edit', function(req, res, next) {
 // 发布文章
 router.post('/edit', function(req, res, next) {
     var username = req.session.user.username;
-    var articleTitle = req.body.title;
-    var articleContent = req.body.content;
-    var articleTag = 'web前端';
+    var param = req.body;
+    console.log(param)
+    return;
     var articleTime = getDate();
-    articleAuthor: username;
-    articlePvn: '阅读(0)';
-    var datas = {};
+    var datas = {
+        articleId: '',
+        articleTitle: param.articleTitle,
+        articleLink: '',
+        articleTag: param.articleTag,
+        articleTime: articleTime,
+        articleAuthor: username,
+        articleContent: param.articleContent
+    };
 
-    userModel.create(datas, function(err, doc) {
+    infoModel.create(datas, function(err, doc) {
         if (err) {
             return errCallback(function() {
                 res.json({ response: { msg: '查询出错请重试!', code: 500 } });
@@ -166,6 +129,16 @@ router.post('/edit', function(req, res, next) {
         res.json({ response: { msg: '注册成功!', code: 200 } });
     });
 
+});
+
+// 文章详情页
+router.get('/articles/:articleID', function(req, res, next) {
+    var userInfo = req.session.user;
+    if (!userInfo) {
+        res.redirect('/');
+        return;
+    }
+    res.render('edit', { title: '发布文章', user: userInfo });
 });
 
 function errCallback(cb) {

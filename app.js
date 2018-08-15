@@ -5,6 +5,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var logger = require('morgan');
 var session = require('express-session');
+var schedule = require('node-schedule');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -48,5 +49,13 @@ app.use(function(err, req, res, next) {
     res.status(err.status || 500);
     res.render('error'); // 把res.locals的东西传进去
 });
+
+function scheduleCronstyle() {
+    schedule.scheduleJob('10 * * * * *', function() {
+        console.log('timeing ' + new Date())
+    });
+}
+
+scheduleCronstyle();
 
 module.exports = app;
