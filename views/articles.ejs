@@ -2,42 +2,55 @@
 <html>
 
 <head>
-    <title>我的发布</title>
+    <title>详情</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <script src="/javascripts/jquery.js"></script>
     <style>
-
+        .article-detail-box {
+            padding: 20px;
+        }
+        
+        h2,
+        p {
+            text-align: center;
+        }
+        
+        h2 {
+            padding: 10px 0;
+        }
+        
+        p {
+            font-size: 14px;
+            padding: 5px;
+        }
+        
+        p span {
+            padding: 0 15px;
+        }
+        
+        .art_dt {
+            font-size: 14px;
+            line-height: 20px;
+            margin-top: 15px;
+        }
     </style>
 </head>
 
 <body>
 
     <%- include("./public/header") %>
-        <div class="container">
-            <% if(article.length){ %>
-                <ul class="item-list" id="item-list-box">
-                    <% for(var i=0,len=article.length;i<len;i++){ %>
-                        <li class="item">
-                            <div class="item-inner">
-                                <a href="/articles/<%= article[i]['_id'] %>" target="_blank" class="item-link">
-                                    <h3>
-                                        <%= article[i].articleTitle %>
-                                    </h3>
-                                    <div class="meto-row"><span class="tags bule"><%= article[i].articleTag %></span><span><%= article[i].articleAuthor %></span><span><%= article[i].articlePvn %></span></div>
-                                </a>
-                            </div>
-                        </li>
-                        <% } %>
-                </ul>
+        <div class="content">
+            <div class="article-detail-box">
+                <h2>
+                    <%= data.articleTitle%>
+                </h2>
+                <p><span>作者：<%= data.articleAuthor %></span><span>发布时间：<%= data.articleTime %></span></p>
 
-                <% if( pageNum > page ){ %>
-                    <button type="button" class="btn-loadmore">加载更多</button>
-                    <% } %>
-                        <% }else{ %>
-                            <div style="padding:15px;text-align:center;font-size:16px;">暂无发布内容!</div>
-                            <% } %>
-
+                <div class="art_dt">
+                    <%= data.articleContent %>
+                </div>
+            </div>
         </div>
         <div id="overlay"></div>
 

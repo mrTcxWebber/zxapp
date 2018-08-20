@@ -19,16 +19,15 @@
                 <% for(var i=0,len=article.length;i<len;i++){ %>
                     <li class="item">
                         <div class="item-inner">
-                            <% if(article[i].articleLink){ %>
-                                <a href="<%= article[i].articleLink %>" target="_blank" class="item-link"></a>
-                                <% }else{ %>
-                                    <a href="http://111.230.232.223/<%= article[i]['_id']%>" target="_blank" class="item-link"></a>
-                                    <% } %>
-
-                                        <h3>
-                                            <%= article[i].articleTitle %>
-                                        </h3>
-                                        <div class="meto-row"><span class="tags bule"><%= article[i].articleTag %></span><span><%= article[i].articleAuthor %></span><span><%= article[i].articlePvn %></span></div>
+                            <% if(article[i].articleLink != ''){ %>
+                                <a href="<%= article[i].articleLink %>" target="_blank" class="item-link">
+                                    <% }else{ %>
+                                        <a href="/articles/<%= article[i]['_id'] %>" target="_blank" class="item-link">
+                                            <% } %>
+                                                <h3>
+                                                    <%= article[i].articleTitle %>
+                                                </h3>
+                                                <div class="meto-row"><span class="tags bule"><%= article[i].articleTag %></span><span><%= article[i].articleAuthor %></span><span><%= article[i].articlePvn %></span></div>
                                         </a>
                         </div>
                     </li>

@@ -6,9 +6,9 @@ var crypto = require('crypto');
 var schedule = require('node-schedule');
 
 
-
-/* GET home page. */
+/* GET home page. and search result page */
 router.get('/', function(req, res, next) {
+    var ks = req.query.kw;
     var userInfo = req.session.user;
     infoModel.find({}, function(err, doc) {
         if (err) {
@@ -107,8 +107,6 @@ router.get('/edit', function(req, res, next) {
 router.post('/edit', function(req, res, next) {
     var username = req.session.user.username;
     var param = req.body;
-    console.log(param)
-    return;
     var articleTime = getDate();
     var datas = {
         articleId: '',
@@ -128,17 +126,41 @@ router.post('/edit', function(req, res, next) {
         };
         res.json({ response: { msg: '注册成功!', code: 200 } });
     });
+});
 
+// 我的发布
+router.get('/m_issue', function(req, res, next) {
+    var userInfo = req.session.user;
+
+    if (!userInfo) {
+        res.redirect('/');
+        return;
+    }
+    infoModel.find({ articleAuthor: userInfo.username }, (err, doc) => {
+        var pageNum = Math.ceil(doc.length / 8);
+        if (err) {
+            throw new Error(err);
+            res.end('查询出错，请重试!')
+            return;
+        }
+
+        res.render('m_issue', { title: '我的发布', user: userInfo, article: doc, pageNum: pageNum, page: 1 });
+    });
 });
 
 // 文章详情页
 router.get('/articles/:articleID', function(req, res, next) {
     var userInfo = req.session.user;
-    if (!userInfo) {
-        res.redirect('/');
-        return;
-    }
-    res.render('edit', { title: '发布文章', user: userInfo });
+    var _id = req.params.articleID;
+
+    infoModel.find({ _id: _id }, function(err, doc) {
+        if (err) {
+            throw err;
+            res.end('查询出错，请重试!')
+            return;
+        }
+        res.render('articles', { title: '文章详情', user: userInfo, data: doc[0] });
+    })
 });
 
 function errCallback(cb) {
@@ -148,7 +170,7 @@ function errCallback(cb) {
 
 function getDate() {
     var d = new Date();
-    return d.getFullYear + '-' + (d.getMonth + 1) + '-' + d.getDate
+    return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
 }
 
 module.exports = router;

@@ -18,13 +18,13 @@
             <form action="javascript:;" method="post" id="edit-form" onsubmit="return indexMain.issueHandler(this);">
                 <div class="form-group">
                     <h5>标题</h5>
-                    <input type="text" class="title" name="title" placeholder="标题.." required>
+                    <input type="text" class="title" name="title" placeholder="标题.." autocomplete="off" required>
                 </div>
                 <div class="form-group">
                     <h5>标签</h5>
                     <div class="tags-box flex-wrap flex-around" id="atc-tags">
                         <a href="javascript:;" data-tags="javascript">javascript</a>
-                        <a href="javascript:;" data-tags="html_css">html/css</a>
+                        <a href="javascript:;" data-tags="html/css">html/css</a>
                     </div>
                     <input type="hidden" name="tag" id="atc-tag-name">
                 </div>

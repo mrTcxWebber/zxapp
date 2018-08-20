@@ -2,6 +2,9 @@
     <div class="head">
         <!-- <i class="btn-toggle-panel"></i> -->
         <span class="head-title"><%= title %></span>
+        <div class="search-box">
+            <a href="javascript:;" class="btn-search icon-search" id="j-site-searchBtn"></a>
+        </div>
         <div class="user-pic" id="J-userMenu">
             <% if(user){ %>
                 <img src="/images/timg.jpg" alt="头像" width="30" height="30">
@@ -13,6 +16,7 @@
             <% if(user){ %>
                 <ul>
                     <li><a href="/edit">发布文章</a></li>
+                    <li><a href="/m_issue">我的发布</a></li>
                     <li><a href="/logout">退出登录</a></li>
                 </ul>
                 <% }else{ %>
@@ -24,3 +28,11 @@
         </div>
     </div>
 </header>
+<div class="head-search-wrap" id="site-search-wrap">
+    <form action="/" class="site-form" method="get">
+        <div class="site-form-inner flex-wrap">
+            <input type="input" name="kw" class="site-search-txt flex-con" placeholder="请输入关键词" />
+            <button type="submit" class="site-search-btn">搜索</button>
+        </div>
+    </form>
+</div>
