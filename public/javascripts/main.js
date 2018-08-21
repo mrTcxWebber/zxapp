@@ -17,12 +17,22 @@ var indexMain = (function($) {
         currenPage: 1
     };
 
+    var util = {
+        getQueryString: function(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return unescape(r[2]);
+            return null;
+        }
+    };
+
     function EventHanlder() {
         // 加载下一页
         Dom.$btnLoadMore.on('click', function() {
+            var kw = Dom.oSiteSearchTxt.val() || util.getQueryString('kw');
             $.ajax({
                 type: 'post',
-                url: '/list?page=' + (Number(Dom.currenPage) + 1),
+                url: '/list?page=' + (Number(Dom.currenPage) + 1) + '&kw=' + kw,
                 success: function(msg) {
                     if (msg.code !== 200) return;
                     var data = msg.data,

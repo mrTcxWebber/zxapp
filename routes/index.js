@@ -8,41 +8,73 @@ var schedule = require('node-schedule');
 
 /* GET home page. and search result page */
 router.get('/', function(req, res, next) {
-    var ks = req.query.kw;
+    var ks = req.query.kw || '';
     var userInfo = req.session.user;
-    infoModel.find({}, function(err, doc) {
+    var query = infoModel.find();
+
+    var _filter = {
+        $or: [ // 多字段同时匹配
+            { articleAuthor: { $regex: ks } },
+            { articleTitle: { $regex: ks, $options: '$i' } }, //  $options: '$i' 忽略大小写
+        ]
+    };
+
+    query.count(_filter, (err, count) => {
         if (err) {
             throw new Error(err);
             return;
         }
-        var pageNum = Math.ceil(doc.length / 8);
-        infoModel.find({}, {}, { limit: 8 }, function(err, doc) {
+        var pageNum = Math.ceil(count / 8);
+        query.find(_filter).limit(8).sort({ '_id': -1 }).exec((err, doc) => {
             if (err) {
                 throw new Error(err);
                 return;
             }
             res.render('index', { title: '发现', user: userInfo, article: doc, pageNum: pageNum, page: 1 });
         })
-    })
+    });
 });
 // 分页
 router.post('/list', function(req, res, next) {
+    var ks = req.query.kw || '';
     var page = req.query.page || 1;
     var skipNum = (page - 1) * 8;
-    infoModel.find({}, function(err, doc) {
+    var query = infoModel.find();
+    var _filter = {
+        $or: [ // 多字段同时匹配
+            { articleAuthor: { $regex: ks } },
+            { articleTitle: { $regex: ks, $options: '$i' } }, //  $options: '$i' 忽略大小写
+        ]
+    };
+
+    query.count(_filter, (err, count) => {
         if (err) {
             throw new Error(err);
             return;
         }
-        var pageNum = Math.ceil(doc.length / 8);
-        infoModel.find({}, {}, { limit: 8, skip: skipNum }, function(err, doc) {
+        var pageNum = Math.ceil(count / 8);
+        query.find(_filter).sort({ '_id': -1 }).skip(skipNum).limit(8).exec((err, doc) => {
             if (err) {
                 throw new Error(err);
                 return;
             }
             res.json({ code: 200, msg: 'ok', data: doc, pageNum: pageNum, page: page });
-        })
-    })
+        });
+    });
+    // infoModel.find({}, function(err, doc) {
+    //     if (err) {
+    //         throw new Error(err);
+    //         return;
+    //     }
+    //     var pageNum = Math.ceil(doc.length / 8);
+    //     infoModel.find({}, {}, { limit: 8, skip: skipNum }, function(err, doc) {
+    //         if (err) {
+    //             throw new Error(err);
+    //             return;
+    //         }
+    //         res.json({ code: 200, msg: 'ok', data: doc, pageNum: pageNum, page: page });
+    //     })
+    // })
 });
 
 // 登录
