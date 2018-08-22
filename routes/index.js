@@ -151,7 +151,7 @@ router.all('/alarm', function(req, res, next) {
     var bodyArg = req.body;
     console.log(req.params)
     var logTxt = path.join(__dirname, 'public/log.txt');
-    return;
+    
     fs.appendFile(logTxt, data, (err) => {
         if(err) {
             return errCallback(() => {
