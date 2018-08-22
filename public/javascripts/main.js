@@ -11,15 +11,28 @@ var indexMain = (function($) {
         oRegDialog: $('#regist_dialog'),
         oBtnClose: $('.btn-close-dialog'),
         oArticleTagsBox: $('#atc-tags'),
+        oHeadSearchBtn: $('#j-site-searchBtn'), // head搜索按钮
+        oSiteSearchTxt: $('.site-search-txt'), // site search value
+        oSiteSearchWrap: $('#site-search-wrap'),
         currenPage: 1
+    };
+
+    var util = {
+        getQueryString: function(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return unescape(r[2]);
+            return null;
+        }
     };
 
     function EventHanlder() {
         // 加载下一页
         Dom.$btnLoadMore.on('click', function() {
+            var kw = Dom.oSiteSearchTxt.val() || util.getQueryString('kw');
             $.ajax({
                 type: 'post',
-                url: '/list?page=' + (Number(Dom.currenPage) + 1),
+                url: '/list?page=' + (Number(Dom.currenPage) + 1) + '&kw=' + kw,
                 success: function(msg) {
                     if (msg.code !== 200) return;
                     var data = msg.data,
@@ -28,9 +41,13 @@ var indexMain = (function($) {
                     Dom.currenPage = msg.page;
                     $.each(data, function(i, v) {
                         html += '<li class="item">' +
-                            '<div class="item-inner">' +
-                            '<a href="' + v.articleLink + '" target="_blank" class="item-link">' +
-                            '<h3>' + v.articleTitle + '</h3>' +
+                            '<div class="item-inner">';
+                        if (v.articleLink) {
+                            html += '<a href="' + v.articleLink + '" target="_blank" class="item-link">';
+                        } else {
+                            html += '<a href="/articles/' + v['_id'] + '" target="_blank" class="item-link">';
+                        }
+                        html += '<h3>' + v.articleTitle + '</h3>' +
                             '<div class="meto-row"><span class="tags bule">' + v.articleTag + '</span><span>' + v.articleAuthor + '</span><span>' + v.articlePvn + '</span></div>' +
                             '</a>' +
                             '</div>' +
@@ -74,13 +91,22 @@ var indexMain = (function($) {
         });
 
         // issue page select tags
-        Dom.oArticleTagsBox.on('a', 'click', function() {
+        Dom.oArticleTagsBox.on('click', function() {
             var tag = $(this).data('tags');
             $(this).addClass('on').siblings().removeClass('on');
             $('#atc-tag-name').val(tag);
-            console.log(80)
-            console.log($('#atc-tag-name').val())
         })
+
+        // 切换site search area
+        Dom.oHeadSearchBtn.on('click', function() {
+            Dom.oSiteSearchWrap.toggleClass('active');
+        });
+
+        // encodeURIComponent 搜素内容
+        Dom.oSiteSearchTxt.on('blur', function() {
+            var enCodeVal = encodeURIComponent($(this).val());
+            $(this).val(enCodeVal)
+        });
     }
 
     function Main() {
@@ -117,7 +143,7 @@ var indexMain = (function($) {
         })
     }
 
-    // login submit
+    // regist submit
     function registHandler(form) {
         var username = form.username.value.trim();
         var pwd = form.pwd.value.trim();
@@ -153,8 +179,8 @@ var indexMain = (function($) {
         var articleTitle = form.title.value.trim();
         var articleContent = form.content.value.trim();
         var articleTag = form.tag.value.trim();
-        if (!articleTitle || !articleContent) {
-            $("#edit-form .tips").text('请输入正确内容！');
+        if (!articleTitle || !articleContent || !articleTag) {
+            $("#edit-form .tips").text('请选择或输入的内容齐全！');
             return false;
         }
         // var formParam = $(form).serialize();
