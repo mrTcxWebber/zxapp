@@ -1,5 +1,7 @@
 var express = require('express');
 var router = express.Router();
+var path = require('path');
+var fs = require('fs');
 var infoModel = require('../models/infoModel');
 var userModel = require('../models/userModel');
 var crypto = require('crypto');
@@ -140,6 +142,32 @@ router.get('/articles/:articleID', function(req, res, next) {
     }
     res.render('edit', { title: '发布文章', user: userInfo });
 });
+
+
+
+// 接受告警信息
+router.all('/alarm', function(req, res, next) {
+    var param = req.params;
+    var bodyArg = req.body;
+    console.log(req.params)
+    var logTxt = path.join(__dirname, 'public/log.txt');
+    return;
+    fs.appendFile(logTxt, data, (err) => {
+        if(err) {
+            return errCallback(() => {
+                res.json({ response: { msg: err, code: 500 } });
+            });
+        }
+        fs.readFile(logTxt, 'utf8', function(rderr, data) {
+            if(rderr) {
+                return errCallback(() => {
+                    res.json({ response: { msg: err, code: 500 } });
+                });
+            }
+            res.json({ response: { msg: '读取成功！', code: 500 }, result: data });
+        });
+    });
+})
 
 function errCallback(cb) {
     typeof cb === 'function' && cb();
