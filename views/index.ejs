@@ -22,7 +22,7 @@
                             <% if(article[i].articleLink != ''){ %>
                                 <a href="<%= article[i].articleLink %>" target="_blank" class="item-link">
                                     <% }else{ %>
-                                        <a href="/articles/<%= article[i]['_id'] %>" target="_blank" class="item-link">
+                                        <a href="/articles/<%= article[i]['_id'] %>" class="item-link">
                                             <% } %>
                                                 <h3>
                                                     <%= article[i].articleTitle %>

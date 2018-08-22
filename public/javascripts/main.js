@@ -45,7 +45,7 @@ var indexMain = (function($) {
                         if (v.articleLink) {
                             html += '<a href="' + v.articleLink + '" target="_blank" class="item-link">';
                         } else {
-                            html += '<a href="/articles/' + v['_id'] + '" target="_blank" class="item-link">';
+                            html += '<a href="/articles/' + v['_id'] + '" class="item-link">';
                         }
                         html += '<h3>' + v.articleTitle + '</h3>' +
                             '<div class="meto-row"><span class="tags bule">' + v.articleTag + '</span><span>' + v.articleAuthor + '</span><span>' + v.articlePvn + '</span></div>' +
@@ -91,7 +91,7 @@ var indexMain = (function($) {
         });
 
         // issue page select tags
-        Dom.oArticleTagsBox.on('click', function() {
+        Dom.oArticleTagsBox.on('click','a', function() {
             var tag = $(this).data('tags');
             $(this).addClass('on').siblings().removeClass('on');
             $('#atc-tag-name').val(tag);
