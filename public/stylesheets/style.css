@@ -503,7 +503,7 @@ th {
     line-height: 1.2;
     color: #2e3135;
     font-size: 1.2rem;
-    margin: 1rem 0 .8rem;
+    margin: 0rem 0 .8rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -783,7 +783,7 @@ th {
 /* 发布 */
 
 #edit-form {
-    display: inline-block;
+    display: block;
     width: 90%;
     margin: 0 auto;
     padding: 15px;

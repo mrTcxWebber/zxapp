@@ -6,25 +6,24 @@
             <a href="javascript:;" class="btn-search icon-search" id="j-site-searchBtn"></a>
         </div>
         <div class="user-pic" id="J-userMenu">
-            <% if(user){ %>
-                <img src="/images/timg.jpg" alt="头像" width="30" height="30">
-                <% }else{ %>
-                    <img src="/images/touxiang.jpg" alt="头像" width="30" height="30">
-                    <% } %>
+            
+                <img src="/images/timg.jpg" alt="头像" width="30" height="30" data-loginType="hasLogin" />                
+                    <img src="/images/touxiang.jpg" alt="头像" width="30" height="30" data-loginType="unLogin" />
+    
         </div>
         <div class="menu-info" id="member-info">
-            <% if(user){ %>
-                <ul>
+            
+                <ul data-loginType="hasLogin">
                     <li><a href="/edit">发布文章</a></li>
-                    <li><a href="/m_issue">我的发布</a></li>
-                    <li><a href="/logout">退出登录</a></li>
+                    <li><a href="/m_issue" data-links="m_issue">我的发布</a></li>
+                    <li><a href="#" data-links="logout">退出登录</a></li>
                 </ul>
-                <% }else{ %>
-                    <ul>
+            
+                    <ul data-loginType="unLogin">
                         <li><a href="javascript:;" id="J-showLoginBox">登录</a></li>
                         <li><a href="javascript:;" id="J-showRegBox">注册</a></li>
                     </ul>
-                    <% } %>
+                    
         </div>
     </div>
 </header>

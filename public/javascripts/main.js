@@ -14,7 +14,9 @@ var indexMain = (function($) {
         oHeadSearchBtn: $('#j-site-searchBtn'), // head搜索按钮
         oSiteSearchTxt: $('.site-search-txt'), // site search value
         oSiteSearchWrap: $('#site-search-wrap'),
-        currenPage: 1
+        currenPage: 1,
+        oBtnLogout: $('[data-links="logout"]'),
+        oBtnToMIssue: $('[data-links="m_issue"]'),
     };
 
     var util = {
@@ -23,10 +25,33 @@ var indexMain = (function($) {
             var r = window.location.search.substr(1).match(reg);
             if (r != null) return unescape(r[2]);
             return '';
-        }
+        },
+        cookie: function(cname, value, exdays) {
+            if (typeof value == 'undefined') {
+                var name = cname + "=";
+                var ca = document.cookie.split(';');
+                for (var i = 0; i < ca.length; i++) {
+                    var c = ca[i];
+                    while (c.charAt(0) == ' ') c = c.substring(1);
+                    if (c.indexOf(name) != -1) return c.substring(name.length, c.length);
+                }
+                return '';
+            } else if (value == null) {
+                return this.cookie(cname, '', -1);
+            } else {
+                var exdays = arguments[2] || 2;
+                var d = new Date();
+                d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+                var expires = "expires=" + d.toUTCString();
+                var path = location.pathname.substr(0, location.pathname.lastIndexOf('/')) || '/';
+                document.cookie = cname + "=" + value + "; " + expires + ";path=" + path;
+                return value;
+            }
+        },
     };
 
     function EventHanlder() {
+        
         // 加载下一页
         Dom.$btnLoadMore.on('click', function() {
             var kw = Dom.oSiteSearchTxt.val() || util.getQueryString('kw');
@@ -107,7 +132,16 @@ var indexMain = (function($) {
             var enCodeVal = encodeURIComponent($(this).val());
             $(this).val(enCodeVal)
         });
+        
+        Dom.oBtnLogout.on('click', function() {
+            localStorage['token'] = '';
+            localStorage['user'] = '';
+            util.cookie('token', null);
+            location.href = '/logout';
+        });
+
     }
+    
 
     function Main() {
         EventHanlder();
@@ -135,6 +169,9 @@ var indexMain = (function($) {
             success: function(data) {
                 if (data.response.code == 200) {
                     $("#login_dialog .dialog_foot p").text(data.response.msg);
+                    localStorage.setItem('token',data.response.token);
+                    localStorage['user'] = data.response.user;
+                    util.cookie('token', data.response.token, 10);
                     location.reload();
                 } else {
                     $("#login_dialog .dialog_foot p").text(data.response.msg);
@@ -163,7 +200,7 @@ var indexMain = (function($) {
             success: function(data) {
                 if (data.response.code == 200) {
                     $("#regist_dialog .dialog_foot p").text('注册成功!');
-                    setTimeout(function() { location.reload(); }, 1000);
+                    setTimeout(function() { location.href="/login" }, 1000);
                 } else {
                     $("#regist_dialog .dialog_foot p").text(data.response.msg);
                 }
@@ -188,6 +225,7 @@ var indexMain = (function($) {
             method: 'post',
             url: '/edit',
             data: {
+                token: localStorage['token'],
                 articleTitle: articleTitle,
                 articleContent: articleContent,
                 articleTag: articleTag

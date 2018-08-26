@@ -5,8 +5,8 @@ var fs = require('fs');
 var infoModel = require('../models/infoModel');
 var userModel = require('../models/userModel');
 var crypto = require('crypto');
+const jwt = require('jsonwebtoken');
 var schedule = require('node-schedule');
-
 
 /* GET home page. and search result page */
 router.get('/', function(req, res, next) {
@@ -26,7 +26,7 @@ router.get('/', function(req, res, next) {
             return;
         }
         var pageNum = Math.ceil(doc.length / 8);
-        infoModel.find(_filter, {}, {limit:8,sort:{'_id':-1}}, (err, doc) => {
+        infoModel.find(_filter, {}, { limit: 8, sort: { '_id': -1 } }, (err, doc) => {
             if (err) {
                 throw new Error(err);
                 return;
@@ -53,7 +53,7 @@ router.post('/list', function(req, res, next) {
             return;
         }
         var pageNum = Math.ceil(doc.length / 8);
-        infoModel.find({}, {}, { limit: 8, skip: skipNum, sort:{'_id':-1} }, function(err, doc) {
+        infoModel.find({}, {}, { limit: 8, skip: skipNum, sort: { '_id': -1 } }, function(err, doc) {
             if (err) {
                 throw new Error(err);
                 return;
@@ -72,15 +72,19 @@ router.post('/login', function(req, res, next) {
 
     var userLogin = new userModel({ username: username, password: ncrypPwd });
 
-    userLogin.login(function(err, doc) {
+    userLogin.login((err, doc) => {
         if (err) {
             return errCallback(function() {
                 res.json({ response: { msg: err, code: 500 } });
             });
         }
-
-        req.session.user = doc[0];
-        res.json({ response: { msg: '登录成功！', code: 200 } });
+        
+        const token = jwt.sign({
+            name: doc.username,
+            _id: doc._id
+        }, 'zxapp', { expiresIn: '10d' });
+        req.session.user = doc;
+        res.json({ response: { msg: '登录成功！', code: 200, token: token, user: doc.username} });
     });
 });
 
@@ -114,17 +118,31 @@ router.get('/logout', function(req, res, next) {
 });
 // 发布页
 router.get('/edit', function(req, res, next) {
-    var userInfo = req.session.user;
-    if (!userInfo) {
-        res.redirect('/');
-        return;
-    }
-    res.render('edit', { title: '发布文章', user: userInfo });
+    // if (!userInfo) {
+    //     res.redirect('/');
+    //     return;
+    // }
+    res.render('edit', { title: '发布文章' });
 });
 // 发布文章
 router.post('/edit', function(req, res, next) {
-    var username = req.session.user.username;
-    var param = req.body;
+    var param = req.body;    
+    let token = param.token;
+    var username = '';
+    try {
+        tokenDecode = jwt.verify(token, 'zxapp');
+        if(tokenDecode.iat > tokenDecode.exp){
+            res.json({ response: { msg: '请重新登录!', code: 500 } });
+            return;
+        }
+        username = tokenDecode.name;
+    }catch(e) {
+        console.log(e)
+        res.json({ response: { msg: '请登录!', code: 500 } });
+        return;
+    }
+
+    // var username = req.session.user.username;
     var articleTime = getDate();
     var datas = {
         articleId: '',
@@ -142,27 +160,22 @@ router.post('/edit', function(req, res, next) {
                 res.json({ response: { msg: '查询出错请重试!', code: 500 } });
             });
         };
-        res.json({ response: { msg: '注册成功!', code: 200 } });
+        res.json({ response: { msg: '发布成功!', code: 200 } });
     });
 });
 
 // 我的发布
 router.get('/m_issue', function(req, res, next) {
-    var userInfo = req.session.user;
-
-    if (!userInfo) {
-        res.redirect('/');
-        return;
-    }
-    infoModel.find({ articleAuthor: userInfo.username }, (err, doc) => {
+    var username = req.session.user.username;
+    
+    infoModel.find({ articleAuthor: username }, (err, doc) => {
         var pageNum = Math.ceil(doc.length / 8);
         if (err) {
             throw new Error(err);
             res.end('查询出错，请重试!')
             return;
         }
-
-        res.render('m_issue', { title: '我的发布', user: userInfo, article: doc, pageNum: pageNum, page: 1 });
+        res.render('m_issue', { title: '我的发布', article: doc, pageNum: pageNum, page: 1 });
     });
 });
 
@@ -189,15 +202,15 @@ router.all('/alarm', function(req, res, next) {
     var bodyArg = req.body;
     console.log(req.params)
     var logTxt = path.join(__dirname, 'public/log.txt');
-    
+
     fs.appendFile(logTxt, data, (err) => {
-        if(err) {
+        if (err) {
             return errCallback(() => {
                 res.json({ response: { msg: err, code: 500 } });
             });
         }
         fs.readFile(logTxt, 'utf8', function(rderr, data) {
-            if(rderr) {
+            if (rderr) {
                 return errCallback(() => {
                     res.json({ response: { msg: err, code: 500 } });
                 });
