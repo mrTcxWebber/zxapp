@@ -69,7 +69,7 @@ router.post('/login', function(req, res, next) {
     var pwd = req.body.pwd;
     var hash = crypto.createHash('md5');
     var ncrypPwd = hash.update(pwd).digest('hex');
-
+    
     var userLogin = new userModel({ username: username, password: ncrypPwd });
 
     userLogin.login((err, doc) => {
