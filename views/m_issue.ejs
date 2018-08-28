@@ -7,7 +7,7 @@
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <script src="/javascripts/jquery.js"></script>
     <style>
-
+        
     </style>
 </head>
 
@@ -19,7 +19,7 @@
                 <ul class="item-list" id="item-list-box">
                     <% for(var i=0,len=article.length;i<len;i++){ %>
                         <li class="item">
-                            <div class="item-inner">
+                            <div class="item-inner" data-id="<%= article[i]['_id'] %>">
                                 <a href="/articles/<%= article[i]['_id'] %>" target="_blank" class="item-link">
                                     <h3>
                                         <%= article[i].articleTitle %>
@@ -27,6 +27,8 @@
                                     <div class="meto-row"><span class="tags bule"><%= article[i].articleTag %></span><span><%= article[i].articleAuthor %></span><span><%= article[i].articlePvn %></span></div>
                                 </a>
                             </div>
+                            <a href="/updateAtl/<%= article[i]['_id'] %>" class="opera-btn" data-btn="modifly">修改</a>
+                            <a href="javascript:;" class="opera-btn" data-btn="remove">删除</a>
                         </li>
                         <% } %>
                 </ul>
@@ -92,9 +94,11 @@
 </body>
 <script src="/javascripts/main.js"></script>
 <script>
+    
     $(function() {
         var isLogin = localStorage['token'] ? true : false;
         isLogin ? $('[data-loginType="unLogin"]').remove() : $('[data-loginType="hasLogin"]').remove();
+
     });
 </script>
 

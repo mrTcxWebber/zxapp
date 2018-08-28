@@ -480,14 +480,14 @@ th {
     font-size: 1.4rem;
     margin: 0 2rem;
 }
-
+.item-list {overflow: hidden;}
 .item {
-    border-bottom: 1px solid rgba(178, 186, 194, .15);
+    height:76px;border-bottom: 1px solid rgba(178, 186, 194, .15);
+    position: relative;
 }
 
 .item-inner {
     padding: 1.167rem 2rem;
-    min-height: 5.75rem;
 }
 
 .item-inner>a {
@@ -508,7 +508,19 @@ th {
     overflow: hidden;
     text-overflow: ellipsis;
 }
-
+.item .opera-btn {position: absolute;
+top: 0;
+z-index: 30;
+width: 20%;height: 76px;line-height: 76px;text-align: center;font-size: 1.25rem;color: #ffffff;background-color: #56c4e1;
+}
+.item a:first-of-type {border-right: 1px solid #fff;}
+.item [data-btn="modifly"] {
+    right: -20%;
+}
+.item [data-btn="remove"] {
+    right: -40%;
+}
+.swipeleft{transform:translateX(-40%);-webkit-transform:translateX(-40%);}
 .meto-row {
     font-size: 1rem;
     color: #8f969c;

@@ -15,10 +15,14 @@
 
     <%- include("./public/header") %>
         <div class="content">
-            <form action="javascript:;" method="post" id="edit-form" onsubmit="return indexMain.issueHandler(this);">
+            <form action="javascript:;" method="post" id="edit-form" onsubmit="return indexMain.issueHandler(this, '<%= articleType%>', '<%= articleId%>');">
                 <div class="form-group">
                     <h5>标题</h5>
-                    <input type="text" class="title" name="title" placeholder="标题.." autocomplete="off" required>
+                    <% if(articleType =='modifly'){ %>
+                        <input type="text" class="title" name="title" value="<%= data.articleTitle%>" placeholder="标题.." autocomplete="off" required>
+                    <% }else{ %>
+                        <input type="text" class="title" name="title" placeholder="标题.." autocomplete="off" required>
+                    <% } %>
                 </div>
                 <div class="form-group">
                     <h5>标签</h5>
@@ -30,7 +34,11 @@
                 </div>
                 <div class="form-group">
                     <h5>内容</h5>
-                    <textarea name="content" placeholder="请输入..." required></textarea>
+                    <% if(articleType =='modifly'){ %>
+                        <textarea name="content" placeholder="请输入..." required><%= data.articleContent%></textarea>
+                    <% }else{ %>
+                        <textarea name="content" placeholder="请输入..." required></textarea>
+                    <% } %>
                 </div>
                 <p class="tips"></p>
                 <input type="submit" class="btn-submit" value="发布">
@@ -41,6 +49,8 @@
 </body>
 <script src="/javascripts/main.js"></script>
 <script>
+    var articleType = '<%= articleType%>';
+    var articleId = '<%= articleId%>';
     $(function() {
         var isLogin = localStorage['token'] ? true : false;
         isLogin ? $('[data-loginType="unLogin"]').remove() : $('[data-loginType="hasLogin"]').remove();

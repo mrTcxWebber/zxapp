@@ -17,6 +17,9 @@ var indexMain = (function($) {
         currenPage: 1,
         oBtnLogout: $('[data-links="logout"]'),
         oBtnToMIssue: $('[data-links="m_issue"]'),
+        oArticleItem: $('.item-list .item'),
+        oArtModiflBtn: $('.item-list [data-btn="modifly"]'),
+        oArtDelBtn: $('.item-list [data-btn="remove"]'),
     };
 
     var util = {
@@ -141,10 +144,76 @@ var indexMain = (function($) {
         });
 
     }
+
+    // swipe 
+    function swipeHanlder() {
+        var x, y, X, Y, swipeX, swipeY;
+        var expansion = null;
+        if(!$('.item-list').find('.opera-btn').length) return;
+        Dom.oArticleItem.on('touchstart', function(event) {
+            x = event.originalEvent.changedTouches[0].pageX;
+            y = event.originalEvent.changedTouches[0].pageY;
+            swipeX = true;
+            swipeY = true ;
+            if(expansion){   //判断是否展开，如果展开则收起
+                expansion.removeClass('swipeleft');
+            }        
+        });
+        Dom.oArticleItem.on('touchmove', function(event) {
+            X = event.originalEvent.changedTouches[0].pageX;
+            Y = event.originalEvent.changedTouches[0].pageY;        
+            // 左右滑动
+            if(swipeX && Math.abs(X - x) - Math.abs(Y - y) > 0){
+                // 阻止事件冒泡
+                event.stopPropagation();
+                if(X - x > 10){   //右滑
+                    event.preventDefault();
+                    $(this).removeClass('swipeleft'); //右滑收起
+                }
+                if(x - X > 10){   //左滑
+                    event.preventDefault();
+                    $(this).addClass('swipeleft');   //左滑展开
+                    expansion = $(this);
+                }
+                swipeY = false;
+            }
+            // 上下滑动
+            if(swipeY && Math.abs(X - x) - Math.abs(Y - y) < 0) {
+                swipeX = false;
+            }        
+        });
+        
+        
+        Dom.oArtDelBtn.on('click', function() {  // 删除article
+            var _id = $(this).siblings('.item-inner').attr('data-id');
+            var _this = $(this);
+            var isRm = confirm('确定删除吗？');
+            if(!isRm) return;
+            $.ajax({
+                method: 'post',
+                url: '/rmAricle',
+                headers: {
+                    'authorization': localStorage['user']
+                },
+                data: {
+                    articleId: _id
+                },
+                dataType: 'json',
+                success: function(data) {
+                    if (data.response.code == 200) {
+                        _this.parent().remove();
+                    } else {
+                        alert('出错了，请刷新!')
+                    }
+                }
+            });
+        });
+    }
     
 
     function Main() {
         EventHanlder();
+        swipeHanlder();
     }
 
     Main();
@@ -212,7 +281,9 @@ var indexMain = (function($) {
     }
 
     // 文章发布 submit
-    function issueHandler(form) {
+    function issueHandler(form, articleType, articleId) {
+        var articleType = articleType || 'edit';
+        var articleId = articleId;
         var articleTitle = form.title.value.trim();
         var articleContent = form.content.value.trim();
         var articleTag = form.tag.value.trim();
@@ -228,7 +299,9 @@ var indexMain = (function($) {
                 token: localStorage['token'],
                 articleTitle: articleTitle,
                 articleContent: articleContent,
-                articleTag: articleTag
+                articleTag: articleTag,
+                articleType: articleType,
+                articleId: articleId
             },
             dataType: 'json',
             success: function(data) {
