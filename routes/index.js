@@ -122,13 +122,11 @@ router.get('/edit', function(req, res, next) {
     //     res.redirect('/');
     //     return;
     // }
-    res.render('edit', { title: '发布文章', articleType: 'edit' });
+    res.render('edit', { title: '发布文章' });
 });
 // 发布文章
 router.post('/edit', function(req, res, next) {
     var param = req.body;    
-    var articleType = param.articleType;
-    var _id = param.articleId;
     let token = param.token;
     var username = '';
     try {
@@ -155,25 +153,15 @@ router.post('/edit', function(req, res, next) {
         articleAuthor: username,
         articleContent: param.articleContent
     };
-    if(articleType == 'edit'){
-        infoModel.create(datas, function(err, doc) {
-            if (err) {
-                return errCallback(function() {
-                    res.json({ response: { msg: '查询出错请重试!', code: 500 } });
-                });
-            };
-            res.json({ response: { msg: '发布成功!', code: 200 } });
-        });
-    }else {
-        infoModel.findOneAndUpdate({articleAuthor:username,_id:_id}, datas, function(err, doc) {
-            if (err) {
-                return errCallback(function() {
-                    res.json({ response: { msg: '修改出错,请重试!', code: 500 } });
-                });
-            };
-            res.json({ response: { msg: '发布成功!', code: 200 } });
-        });
-    }
+
+    infoModel.create(datas, function(err, doc) {
+        if (err) {
+            return errCallback(function() {
+                res.json({ response: { msg: '查询出错请重试!', code: 500 } });
+            });
+        };
+        res.json({ response: { msg: '发布成功!', code: 200 } });
+    });
 });
 
 // 我的发布
@@ -203,45 +191,6 @@ router.get('/articles/:articleID', function(req, res, next) {
             return;
         }
         res.render('articles', { title: '文章详情', user: userInfo, data: doc[0] });
-    })
-});
-
-// 修改文章
-router.get('/updateAtl/:articleID', function(req, res, next) {
-    var _id = req.params.articleID;
-    
-    infoModel.findOne({_id:_id}, function(err, doc) {
-        if (err) {
-            throw err
-        };
-        
-        res.render('edit', { title: '发布文章', data: doc, articleId: _id, articleType:'modifly' });
-    });
-});
-
-// 删除文章
-router.post('/rmAricle', function(req, res, next) {
-    var _id = req.body.articleId;
-    let token = req.headers.authorization;
-    var username = '';
-    try {
-        tokenDecode = jwt.verify(token, 'zxapp');
-        if(tokenDecode.iat > tokenDecode.exp){
-            res.json({ response: { msg: '请重新登录!', code: 500 } });
-            return;
-        }
-        username = tokenDecode.name;
-    }catch(e) {
-        console.log(e)
-        res.json({ response: { msg: '请登录!', code: 500 } });
-        return;
-    }
-
-    infoModel.find({_id:_id,articleAuthor:username}).remove().then(result => { //{ n: 1, ok: 1 }
-        res.json({ response: { msg: '删除成功!', code: 200 } });
-    }).catch(err => {
-        throw err;
-        res.json({ response: { msg: '删除失败请重试!', code: 500 } });
     })
 });
 
