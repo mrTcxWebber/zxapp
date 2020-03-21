@@ -308,7 +308,8 @@ var indexMain = (function($) {
             dataType: 'json',
             success: function(data) {
                 if (data.response.code == 200) {
-                    $("#edit-form .tips").text('发布成功!');
+                    var resMsg = articleType == 'modifly' ? '修改成功！' : '发布成功！';
+                    $("#edit-form .tips").text(resMsg);
                     setTimeout(function() { location.href = '/' }, 1000);
                 } else {
                     $("#edit-form .tips").text(data.response.msg);

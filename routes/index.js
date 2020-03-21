@@ -173,7 +173,7 @@ router.post('/edit', function(req, res, next) {
                     res.json({ response: { msg: '修改出错,请重试!', code: 500 } });
                 });
             };
-            res.json({ response: { msg: '发布成功!', code: 200 } });
+            res.json({ response: { msg: '修改成功!', code: 200 } });
         });
     }
 });
