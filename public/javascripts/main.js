@@ -137,9 +137,9 @@ var indexMain = (function($) {
         });
         
         Dom.oBtnLogout.on('click', function() {
-            localStorage['token'] = '';
+            // localStorage['token'] = '';
             localStorage['user'] = '';
-            util.cookie('token', null);
+            // util.cookie('token', null);
             location.href = '/logout';
         });
 
@@ -236,11 +236,12 @@ var indexMain = (function($) {
             },
             dataType: 'json',
             success: function(data) {
+                
                 if (data.response.code == 200) {
                     $("#login_dialog .dialog_foot p").text(data.response.msg);
-                    localStorage.setItem('token',data.response.token);
+                    // localStorage.setItem('token',data.response.token);
                     localStorage['user'] = data.response.user;
-                    util.cookie('token', data.response.token, 10);
+                    // util.cookie('token', data.response.token, 10);
                     location.reload();
                 } else {
                     $("#login_dialog .dialog_foot p").text(data.response.msg);
@@ -269,7 +270,7 @@ var indexMain = (function($) {
             success: function(data) {
                 if (data.response.code == 200) {
                     $("#regist_dialog .dialog_foot p").text('注册成功!');
-                    setTimeout(function() { location.href="/login" }, 1000);
+                    // setTimeout(function() { location.href="/login" }, 1000);
                 } else {
                     $("#regist_dialog .dialog_foot p").text(data.response.msg);
                 }
@@ -287,6 +288,7 @@ var indexMain = (function($) {
         var articleTitle = form.title.value.trim();
         var articleContent = form.content.value.trim();
         var articleTag = form.tag.value.trim();
+        
         if (!articleTitle || !articleContent || !articleTag) {
             $("#edit-form .tips").text('请选择或输入的内容齐全！');
             return false;
@@ -296,7 +298,7 @@ var indexMain = (function($) {
             method: 'post',
             url: '/edit',
             data: {
-                token: localStorage['token'],
+                // token: localStorage['token'],
                 articleTitle: articleTitle,
                 articleContent: articleContent,
                 articleTag: articleTag,

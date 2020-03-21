@@ -18,18 +18,18 @@ User.prototype.regist = function(callback) { // 注册
         username: this.username,
         password: this.password,
     };
-
+    
     UserModel.findOne({ username: user.username }, function(err, doc) {
         if (err) {
             // res.json({ response: { msg: '查询出错请重试!', code: 500 } });
             return callback('查询出错请重试!');
         }
-        if (doc.username) {
+        if (doc && doc.username) {
             // res.json({ response: { msg: '该账号已注册!', code: 500 } });
             return callback('该账号已注册!');
         }
         UserModel.create(user, function(err, doc) {
-            callback(err, doc);
+            return callback(err, doc);
         });
     });
 };
@@ -39,13 +39,13 @@ User.prototype.login = function(callback) {
         username: this.username,
         password: this.password,
     };
-
     UserModel.findOne({ username: user.username }, function(err, doc) {
+        
         if (err) {
             // res.json({ response: { msg: '查询出错请重试!', code: 500 } });
             return callback('查询出错请重试!');
         }
-        if (!doc.username) {
+        if (!doc) {
             // res.json({ response: { msg: '账号不存在，请先注册!', code: 500 } });
             return callback('账号不存在，请先注册!');
         }
@@ -54,7 +54,7 @@ User.prototype.login = function(callback) {
             return callback('密码错误，请重试!');
         }
 
-        callback(err, doc);
+        return callback(err, doc);
     });
 };
 

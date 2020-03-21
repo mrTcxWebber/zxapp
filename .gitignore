@@ -3,6 +3,7 @@
 /dist/
 npm-debug.log*
 
+.txt
 
 # Editor directories and files
 .idea

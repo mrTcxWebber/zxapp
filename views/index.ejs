@@ -91,7 +91,7 @@
 <script src="/javascripts/main.js"></script>
 <script>
     $(function() {
-        var isLogin = localStorage['token'] ? true : false;
+        var isLogin = localStorage['user'] ? true : false;
         isLogin ? $('[data-loginType="unLogin"]').remove() : $('[data-loginType="hasLogin"]').remove();
     });
 </script>

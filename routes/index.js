@@ -7,10 +7,12 @@ var userModel = require('../models/userModel');
 var crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 var schedule = require('node-schedule');
+var https = require('https');
+var cheerio = require('cheerio');
 
 /* GET home page. and search result page */
 router.get('/', function(req, res, next) {
-    var ks = req.query.kw || '';
+    var ks = req.query.kw ? decodeURIComponent(req.query.kw) : '';
     var userInfo = req.session.user;
 
     var _filter = {
@@ -37,7 +39,7 @@ router.get('/', function(req, res, next) {
 });
 // 分页
 router.post('/list', function(req, res, next) {
-    var ks = req.query.kw || '';
+    var ks = req.query.kw ? decodeURIComponent(req.query.kw) : '';
     var page = req.query.page || 1;
     var skipNum = (page - 1) * 8;
     var _filter = {
@@ -79,25 +81,26 @@ router.post('/login', function(req, res, next) {
             });
         }
         
-        const token = jwt.sign({
-            name: doc.username,
-            _id: doc._id
-        }, 'zxapp', { expiresIn: '10d' });
+        // const token = jwt.sign({
+        //     name: doc.username,
+        //     _id: doc._id
+        // }, 'fjj', { expiresIn: '1h' });
         req.session.user = doc;
-        res.json({ response: { msg: '登录成功！', code: 200, token: token, user: doc.username} });
+        res.json({ response: { msg: '登录成功！', code: 200, user: doc.username} });
     });
 });
 
 // 注册 regist
 router.post('/regist', function(req, res, next) {
+
     var username = req.body.username;
-    var pwd = req.body.pwd;
-    var hash = crypto.createHash('md5');
-    var ncrypPwd = hash.update(pwd).digest('hex');
+    var pwd = req.body.pwd.toString();
+    var ncrypPwd = crypto.createHash('md5').update(pwd).digest('hex');
     var datas = { username: username, password: ncrypPwd };
 
     var userReg = new userModel({ username: username, password: ncrypPwd });
-
+    
+    
     userReg.regist(function(err, doc) {
         if (err) {
             return errCallback(function() {
@@ -122,29 +125,28 @@ router.get('/edit', function(req, res, next) {
     //     res.redirect('/');
     //     return;
     // }
-    res.render('edit', { title: '发布文章', articleType: 'edit' });
+    res.render('edit', { title: '发布文章', articleType: 'edit', articleId: '0' });
 });
 // 发布文章
 router.post('/edit', function(req, res, next) {
     var param = req.body;    
     var articleType = param.articleType;
     var _id = param.articleId;
-    let token = param.token;
-    var username = '';
-    try {
-        tokenDecode = jwt.verify(token, 'zxapp');
-        if(tokenDecode.iat > tokenDecode.exp){
-            res.json({ response: { msg: '请重新登录!', code: 500 } });
-            return;
-        }
-        username = tokenDecode.name;
-    }catch(e) {
-        console.log(e)
-        res.json({ response: { msg: '请登录!', code: 500 } });
-        return;
-    }
+    // let token = param.token;
+    var username = req.session.user.username;
+    // try {
+    //     tokenDecode = jwt.verify(token, 'fjj');
+    //     if(tokenDecode.iat > tokenDecode.exp){
+    //         res.json({ response: { msg: '请重新登录!', code: 500 } });
+    //         return;
+    //     }
+    //     username = tokenDecode.name;
+    // }catch(e) {
+    //     console.log(e)
+    //     res.json({ response: { msg: '请登录!', code: 500 } });
+    //     return;
+    // }
 
-    // var username = req.session.user.username;
     var articleTime = getDate();
     var datas = {
         articleId: '',
@@ -190,6 +192,39 @@ router.get('/m_issue', function(req, res, next) {
         res.render('m_issue', { title: '我的发布', article: doc, pageNum: pageNum, page: 1 });
     });
 });
+router.get('/test', function (req, res, next) {
+    https.get('https://login.m.taobao.com/login.htm', function (res) {
+        console.log(res.headers['set-cookie']);
+        
+        res.setEncoding('utf-8');
+        if (res.statusCode !== 200) {
+            throw new Error("请求失败 " + res.statusMessage);
+            res.resume();
+            return;
+        }
+        var html = '';
+        res.on('data', function (chunk) {
+            html += chunk;
+        });
+        res.on('end', function () {
+            var logTxt = path.join(__dirname, '/public/log.txt');
+            var ttt = res.headers['set-cookie'];
+            fs.appendFile('log.txt', ttt, (err) => {
+                if (err) {
+                    throw err;
+                }
+                console.log('写入了');
+                
+            });
+            
+        });
+    }).on('error', function (e) {
+        console.log('爬虫出错' + e)
+    });
+    res.render('test', { title: 'test' });
+
+    
+});
 
 // 文章详情页
 router.get('/articles/:articleID', function(req, res, next) {
@@ -223,19 +258,21 @@ router.get('/updateAtl/:articleID', function(req, res, next) {
 router.post('/rmAricle', function(req, res, next) {
     var _id = req.body.articleId;
     let token = req.headers.authorization;
-    var username = '';
-    try {
-        tokenDecode = jwt.verify(token, 'zxapp');
-        if(tokenDecode.iat > tokenDecode.exp){
-            res.json({ response: { msg: '请重新登录!', code: 500 } });
-            return;
-        }
-        username = tokenDecode.name;
-    }catch(e) {
-        console.log(e)
-        res.json({ response: { msg: '请登录!', code: 500 } });
-        return;
-    }
+    var username = req.session.user.username;
+    // try {
+    //     tokenDecode = jwt.verify(token, 'fjj');
+    //     console.log(tokenDecode, req.headers, _id);
+        
+    //     if(tokenDecode.iat > tokenDecode.exp){
+    //         res.json({ response: { msg: '请重新登录!', code: 500 } });
+    //         return;
+    //     }
+    //     username = tokenDecode.name;
+    // }catch(e) {
+    //     console.log(e)
+    //     res.json({ response: { msg: '请登录!', code: 500 } });
+    //     return;
+    // }
 
     infoModel.find({_id:_id,articleAuthor:username}).remove().then(result => { //{ n: 1, ok: 1 }
         res.json({ response: { msg: '删除成功!', code: 200 } });

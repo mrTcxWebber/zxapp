@@ -52,7 +52,7 @@
     var articleType = '<%= articleType%>';
     var articleId = '<%= articleId%>';
     $(function() {
-        var isLogin = localStorage['token'] ? true : false;
+        var isLogin = localStorage['user'] ? true : false;
         isLogin ? $('[data-loginType="unLogin"]').remove() : $('[data-loginType="hasLogin"]').remove();
     });
 </script>

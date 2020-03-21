@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>我的发布</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script src="/javascripts/jquery.js"></script>
+    <style>
+
+    </style>
+</head>
+
+<body>
+
+        <div class="container">
+            test
+        </div>
+
+       
+
+</body>
+<script src="/javascripts/main.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+    $(function () {
+        var getCM = axios.create({
+            responseType: 'text',
+        })
+        getCM.interceptors.request.use(function (config) {
+            console.log(JSON.stringify(config));
+            return config;
+        }, function (error) {
+            return Promise.reject(error);
+        });
+        getCM.interceptors.response.use(function (response) {
+            console.log(JSON.stringify(response));
+            return response;
+        }, function (error) {
+            return Promise.reject(error);
+        });
+        getCM.get('https://login.m.taobao.com/login.htm')
+            .then(function (response) {
+                console.log(JSON.stringify(config));
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+
+    });
+
+</script>
+
+</html>
